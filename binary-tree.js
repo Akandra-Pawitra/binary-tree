@@ -60,8 +60,13 @@ class Tree {
   }
 
   print (address = this.#root, prefix = '', isLeft = true) {
-    // node is root node by default
-    const node = this.#tree[address]
+    let node
+    if (typeof address === 'object') {
+      node = address
+    } else {
+      // in case user doesn't pass a node as the argument
+      node = this.#tree[address]
+    }
     if (node.right !== null) {
       this.print(node.right, `${prefix}${isLeft ? '│   ' : '    '}`, false)
     }
@@ -72,7 +77,13 @@ class Tree {
   }
 }
 
-const list = [0, 0, 6, 3, 8, 1, 4, 7, 5, 9, 2, 2, 4, 7, 9, 5, 1]
+const list = []
+const n = 50
+for (let i = 0; i < n; i += 2) {
+  list.push(i)
+}
+
 const a = new Tree(list)
-a.buildTree()
-a.print()
+const b = a.buildTree()
+// console.log(b)
+a.print(b)
