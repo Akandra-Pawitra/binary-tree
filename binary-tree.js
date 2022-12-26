@@ -21,7 +21,7 @@ class Tree {
     return this.#tree.indexOf(node)
   }
 
-  #addNode (arr, treeAddress, left = true) {
+  #addNode (arr, treeAddress, isLeft = true) {
     const mid = Math.floor(arr.length / 2)
     // initialize tree, only run once
     if (treeAddress === undefined) {
@@ -38,11 +38,11 @@ class Tree {
       if (arr.length < 2) { // base case
         const leaf = this.#newNode(arr[0])
         const tree = this.#tree[treeAddress]
-        left ? tree.left = leaf : tree.right = leaf
+        isLeft ? tree.left = leaf : tree.right = leaf
       } else {
         const leaf = this.#newNode(arr[mid])
         const tree = this.#tree[treeAddress]
-        left ? tree.left = leaf : tree.right = leaf
+        isLeft ? tree.left = leaf : tree.right = leaf
         arr.splice(mid, 1)
         const leftArr = arr.splice(0, mid)
         if (leftArr.length) this.#addNode(leftArr, leaf)
@@ -52,8 +52,13 @@ class Tree {
   }
 
   buildTree () {
+    // doesn't accept undefined value
+    let arr = []
+    for (let i = 0; i < this.input.length; i++) {
+      if (this.input[i] !== this.input) arr.push(this.input[i])
+    }
     // remove duplicate and sort ascending
-    let arr = Array.from(new Set(this.input))
+    arr = Array.from(new Set(this.input))
     arr = arr.sort((a, b) => a - b)
     this.#addNode(arr)
     return this.#tree[this.#root]
@@ -99,6 +104,75 @@ class Tree {
     }
   }
 
+  delete (value) {
+    // I don't even know why or how this method work
+    // find node and keep track the parent
+    let node = this.#tree[this.#root]
+    let parent = null
+    let isLeft = true
+    while (node.value !== value) {
+      if (value > node.value) {
+        parent = node
+        node = this.#tree[node.right]
+        isLeft = false
+      } else if (value < node.value) {
+        parent = node
+        node = this.#tree[node.left]
+        isLeft = true
+      }
+    }
+    // case 1: node is a leaf
+    const address = this.#tree.indexOf(node)
+    if (node.right === null && node.left === null) {
+      // because the pointer point to the index of the node
+      // using splice will messed up with the pointer
+      this.#tree[address] = undefined
+      isLeft ? parent.left = null : parent.right = null
+      // case 2: node has 1 child or branch
+    } else if (node.right === null || node.left === null) {
+      if (node.left !== null) {
+        // node has left branch
+        this.#tree[address] = undefined
+        isLeft ? parent.left = node.left : parent.right = node.left
+      } else {
+        // node has right branch
+        this.#tree[address] = undefined
+        isLeft ? parent.left = node.right : parent.right = node.right
+      }
+      // case 3: node has 2 child or branch
+    } else if (node.right !== null && node.left !== null) {
+      /* find a node that its value if replacing the deleted
+        node still satisfy binary tree criteria */
+      let child = this.#tree[node.right]
+      let nextNode = child.left
+      /* set the child parent pointer to null,
+        otherwise the tree will have cyclical pointer */
+      let prevNode = null
+      while (child.left !== null) {
+        prevNode = child
+        child = this.#tree[nextNode]
+        nextNode = child.left
+      }
+      const childAddress = this.#tree.indexOf(child)
+      if (prevNode === null) {
+        child.left = node.left
+      } else {
+        // Not sure why setting prevNode.left to child.right work
+        // But if it removed, the method will buggy (delete wrong element)
+        prevNode.left = child.right
+        child.right = node.right
+        child.left = node.left
+      }
+      this.#tree[address] = undefined
+      // in case node is lv 0 root node
+      if (parent === null) {
+        this.#root = childAddress
+      } else {
+        isLeft ? parent.left = childAddress : parent.right = childAddress
+      }
+    }
+  }
+
   print (address = this.#root, prefix = '', isLeft = true) {
     let node
     if (typeof address === 'object') {
@@ -118,13 +192,13 @@ class Tree {
 }
 
 const list = []
-const n = 20
-for (let i = 0; i <= n; i += 1) {
+const n = 30
+for (let i = 0; i <= n; i += 2) {
   list.push(i)
 }
 
 const a = new Tree(list)
 a.buildTree()
 // a.print()
-// for (let i = 0; i <= n; i++) if (i % 2) a.insert(i)
-a.print(a.find(5))
+a.delete(8)
+a.print()
