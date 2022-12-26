@@ -21,10 +21,10 @@ class Tree {
     return this.#tree.indexOf(node)
   }
 
-  #addNode (arr, parentAddress, left = true) {
+  #addNode (arr, treeAddress, left = true) {
     const mid = Math.floor(arr.length / 2)
     // initialize tree, only run once
-    if (parentAddress === undefined) {
+    if (treeAddress === undefined) {
       // initialize root (lv 0 node) pointer
       const root = this.#newNode(arr[mid])
       this.#root = root
@@ -36,17 +36,17 @@ class Tree {
       if (arr.length) this.#addNode(arr, root, false)
     } else {
       if (arr.length < 2) { // base case
-        const child = this.#newNode(arr[0])
-        const parent = this.#tree[parentAddress]
-        left ? parent.left = child : parent.right = child
+        const leaf = this.#newNode(arr[0])
+        const tree = this.#tree[treeAddress]
+        left ? tree.left = leaf : tree.right = leaf
       } else {
-        const child = this.#newNode(arr[mid])
-        const parent = this.#tree[parentAddress]
-        left ? parent.left = child : parent.right = child
+        const leaf = this.#newNode(arr[mid])
+        const tree = this.#tree[treeAddress]
+        left ? tree.left = leaf : tree.right = leaf
         arr.splice(mid, 1)
         const leftArr = arr.splice(0, mid)
-        if (leftArr.length) this.#addNode(leftArr, child)
-        if (arr.length) this.#addNode(arr, child, false)
+        if (leftArr.length) this.#addNode(leftArr, leaf)
+        if (arr.length) this.#addNode(arr, leaf, false)
       }
     }
   }
@@ -57,6 +57,35 @@ class Tree {
     arr = arr.sort((a, b) => a - b)
     this.#addNode(arr)
     return this.#tree[this.#root]
+  }
+
+  insert (value) {
+    let tree = this.#tree[this.#root]
+    while (true) {
+      // tree doesn't accept duplicate value
+      if (value === tree.value) return console.log('Duplicate value')
+      else if (value > tree.value) {
+        // if tree pointer isn't null, follow the pointer
+        if (tree.right !== null) {
+          tree = this.#tree[tree.right]
+          continue
+        } else {
+          // if it null, set the pointer to leaf address
+          const leaf = this.#newNode(value)
+          tree.right = leaf
+          break
+        }
+      } else if (value < tree.value) {
+        if (tree.left !== null) {
+          tree = this.#tree[tree.left]
+          continue
+        } else {
+          const leaf = this.#newNode(value)
+          tree.left = leaf
+          break
+        }
+      }
+    }
   }
 
   print (address = this.#root, prefix = '', isLeft = true) {
@@ -78,12 +107,13 @@ class Tree {
 }
 
 const list = []
-const n = 50
-for (let i = 0; i < n; i += 2) {
+const n = 20
+for (let i = 0; i <= n; i += 2) {
   list.push(i)
 }
 
 const a = new Tree(list)
-const b = a.buildTree()
-// console.log(b)
-a.print(b)
+a.buildTree()
+a.print()
+for (let i = 0; i <= n; i++) if (i % 2) a.insert(i)
+a.print()
