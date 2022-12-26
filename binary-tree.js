@@ -55,7 +55,7 @@ class Tree {
     // doesn't accept undefined value
     let arr = []
     for (let i = 0; i < this.input.length; i++) {
-      if (this.input[i] !== this.input) arr.push(this.input[i])
+      if (this.input[i] !== undefined) arr.push(this.input[i])
     }
     // remove duplicate and sort ascending
     arr = Array.from(new Set(this.input))
@@ -190,15 +190,3 @@ class Tree {
     }
   }
 }
-
-const list = []
-const n = 30
-for (let i = 0; i <= n; i += 2) {
-  list.push(i)
-}
-
-const a = new Tree(list)
-a.buildTree()
-// a.print()
-a.delete(8)
-a.print()
