@@ -59,6 +59,17 @@ class Tree {
     return this.#tree[this.#root]
   }
 
+  find (value) {
+    let node = this.#tree[this.#root]
+    while (node.value !== value) {
+      value > node.value
+        ? node = this.#tree[node.right]
+        : node = this.#tree[node.left]
+    }
+    const address = this.#tree.indexOf(node)
+    return this.#tree[address]
+  }
+
   insert (value) {
     let tree = this.#tree[this.#root]
     while (true) {
@@ -108,12 +119,12 @@ class Tree {
 
 const list = []
 const n = 20
-for (let i = 0; i <= n; i += 2) {
+for (let i = 0; i <= n; i += 1) {
   list.push(i)
 }
 
 const a = new Tree(list)
 a.buildTree()
-a.print()
-for (let i = 0; i <= n; i++) if (i % 2) a.insert(i)
-a.print()
+// a.print()
+// for (let i = 0; i <= n; i++) if (i % 2) a.insert(i)
+a.print(a.find(5))
