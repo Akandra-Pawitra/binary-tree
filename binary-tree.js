@@ -170,6 +170,39 @@ class Tree {
     }
   }
 
+  levelOrder (func = null) {
+    // to pass a function, don't invoke it (adding () parentheses)
+    // for example, console.log
+    // or better, use function expression instead declaration
+    const queue = []
+    const result = []
+    queue.push(this.#tree[this.#root])
+    // loop until queue is empty
+    while (queue.length) {
+      // iterative breadth first
+      result.push(queue[0])
+      // if child exist, put in queue
+      if (queue[0].left) queue.push(this.#tree[queue[0].left])
+      if (queue[0].right) queue.push(this.#tree[queue[0].right])
+      // remove first element (FIFO)
+      queue.splice(0, 1)
+    }
+    if (func) {
+      // pass node in result to function parameter
+      for (let i = 0; i < result.length; i++) {
+        const address = this.#tree.indexOf(result[i])
+        const node = this.#tree[address]
+        func(node)
+      }
+    } else {
+      // return array of value
+      for (let i = 0; i < result.length; i++) {
+        result[i] = result[i].value
+      }
+      return result
+    }
+  }
+
   print (address = this.#root, prefix = '', isLeft = true) {
     let node
     if (typeof address === 'object') {
@@ -194,8 +227,10 @@ const arr = []
 for (let i = -10; i < 11; i += 2) if (!(i % 2)) arr.push(i)
 const data = new Tree(arr)
 data.buildTree()
-data.print()
-for (let i = -10; i < 11; i++) if (i % 2) data.insert(i)
-data.print()
-for (let i = -10; i < 11; i++) if (!(i % 3)) data.delete(i)
-data.print()
+// data.print()
+// for (let i = -10; i < 11; i++) if (i % 2) data.insert(i)
+// data.print()
+// for (let i = -10; i < 11; i++) if (!(i % 3)) data.delete(i)
+// data.print()
+console.log(data.levelOrder())
+data.levelOrder(console.log)
