@@ -1,11 +1,3 @@
-class Node {
-  constructor (value) {
-    this.value = value
-    this.left = null
-    this.right = null
-  }
-}
-
 class Tree {
   #root = null
   #tree = []
@@ -14,11 +6,16 @@ class Tree {
     this.input = arr
   }
 
-  #newNode (value) {
+  #node (value) {
     // create new Node and return the address
-    const node = new Node(value)
-    this.#tree.push(node)
-    return this.#tree.indexOf(node)
+    // const node = new Node(value)
+    const newNode = {
+      value,
+      left: null,
+      right: null
+    }
+    this.#tree.push(newNode)
+    return this.#tree.indexOf(newNode)
   }
 
   #addNode (arr, treeAddress, isLeft = true) {
@@ -26,7 +23,7 @@ class Tree {
     // initialize tree, only run once
     if (treeAddress === undefined) {
       // initialize root (lv 0 node) pointer
-      const root = this.#newNode(arr[mid])
+      const root = this.#node(arr[mid])
       this.#root = root
       // splice mutate the array
       arr.splice(mid, 1)
@@ -36,11 +33,11 @@ class Tree {
       if (arr.length) this.#addNode(arr, root, false)
     } else {
       if (arr.length < 2) { // base case
-        const leaf = this.#newNode(arr[0])
+        const leaf = this.#node(arr[0])
         const tree = this.#tree[treeAddress]
         isLeft ? tree.left = leaf : tree.right = leaf
       } else {
-        const leaf = this.#newNode(arr[mid])
+        const leaf = this.#node(arr[mid])
         const tree = this.#tree[treeAddress]
         isLeft ? tree.left = leaf : tree.right = leaf
         arr.splice(mid, 1)
@@ -87,7 +84,7 @@ class Tree {
           continue
         } else {
           // if it null, set the pointer to leaf address
-          const leaf = this.#newNode(value)
+          const leaf = this.#node(value)
           tree.right = leaf
           break
         }
@@ -96,7 +93,7 @@ class Tree {
           tree = this.#tree[tree.left]
           continue
         } else {
-          const leaf = this.#newNode(value)
+          const leaf = this.#node(value)
           tree.left = leaf
           break
         }
@@ -158,7 +155,7 @@ class Tree {
         child.left = node.left
       } else {
         // Not sure why setting prevNode.left to child.right work
-        // But if it removed, the method will buggy (delete wrong element)
+        // But if it removed, the method will not work as intended
         prevNode.left = child.right
         child.right = node.right
         child.left = node.left
@@ -170,6 +167,39 @@ class Tree {
       } else {
         isLeft ? parent.left = childAddress : parent.right = childAddress
       }
+    }
+  }
+
+  levelOrder (func = null) {
+    // to pass a function, don't invoke it (adding () parentheses)
+    // for example, console.log
+    // or better, use function expression instead declaration
+    const queue = []
+    const result = []
+    queue.push(this.#tree[this.#root])
+    // loop until queue is empty
+    while (queue.length) {
+      // iterative breadth first
+      result.push(queue[0])
+      // if child exist, put in queue
+      if (queue[0].left) queue.push(this.#tree[queue[0].left])
+      if (queue[0].right) queue.push(this.#tree[queue[0].right])
+      // remove first element (FIFO)
+      queue.splice(0, 1)
+    }
+    if (func) {
+      // pass node in result to function parameter
+      for (let i = 0; i < result.length; i++) {
+        const address = this.#tree.indexOf(result[i])
+        const node = this.#tree[address]
+        func(node)
+      }
+    } else {
+      // return array of value
+      for (let i = 0; i < result.length; i++) {
+        result[i] = result[i].value
+      }
+      return result
     }
   }
 
@@ -190,3 +220,17 @@ class Tree {
     }
   }
 }
+
+// code below is for testing
+// still manual, no auto test yet
+const arr = []
+for (let i = -10; i < 11; i += 2) if (!(i % 2)) arr.push(i)
+const data = new Tree(arr)
+data.buildTree()
+// data.print()
+// for (let i = -10; i < 11; i++) if (i % 2) data.insert(i)
+// data.print()
+// for (let i = -10; i < 11; i++) if (!(i % 3)) data.delete(i)
+// data.print()
+console.log(data.levelOrder())
+data.levelOrder(console.log)
