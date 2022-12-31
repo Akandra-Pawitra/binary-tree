@@ -68,8 +68,7 @@ class Tree {
         ? node = this.#tree[node.right]
         : node = this.#tree[node.left]
     }
-    const address = this.#tree.indexOf(node)
-    return this.#tree[address]
+    return node
   }
 
   insert (value) {
@@ -101,13 +100,39 @@ class Tree {
     }
   }
 
+  height (node) {
+    // find the node position in the tree
+    let treeNode = this.#tree[this.#root]
+    while (node.value !== treeNode.value) {
+      node.value > treeNode.value
+        ? treeNode = this.#tree[treeNode.right]
+        : treeNode = this.#tree[treeNode.left]
+    }
+    // traverse the tree per level
+    const queue = []
+    queue.push(treeNode)
+    let nodeHeight = 0
+    while (queue.length) {
+      const lastQueue = queue.length
+      // queue all queued node children
+      for (let i = 0; i < queue.length; i++) {
+        if (queue[i].right) queue.push(this.#tree[queue[i].right])
+        if (queue[i].left) queue.push(this.#tree[queue[i].left])
+      }
+      // dequeue old node
+      queue.splice(0, lastQueue)
+      nodeHeight++
+    }
+    return nodeHeight
+  }
+
   depth (node) {
     let depth = 0
-    let root = this.#tree[this.#root]
-    while (node.value !== root.value) {
-      node.value > root.value
-        ? root = this.#tree[root.right]
-        : root = this.#tree[root.left]
+    let treeNode = this.#tree[this.#root]
+    while (node.value !== treeNode.value) {
+      node.value > treeNode.value
+        ? treeNode = this.#tree[treeNode.right]
+        : treeNode = this.#tree[treeNode.left]
       depth++
     }
     return depth
@@ -342,4 +367,6 @@ for (let i = 1; i < 20; i += 2) arr.push(i)
 const data = new Tree(arr)
 data.buildTree()
 data.print()
-console.log(data.depth(data.find(3)))
+const node = data.find(17)
+console.log(data.height(node))
+console.log(data.depth(node))
