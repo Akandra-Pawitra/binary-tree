@@ -174,6 +174,7 @@ class Tree {
     // to pass a function, don't invoke it (adding () parentheses)
     // for example, console.log
     // or better, use function expression instead declaration
+    // FIFO
     const queue = []
     const result = []
     queue.push(this.#tree[this.#root])
@@ -203,6 +204,37 @@ class Tree {
     }
   }
 
+  preorder (func = null) {
+    // LIFO
+    const stack = []
+    const result = []
+    let node = this.#tree[this.#root]
+    stack.push(node)
+    while (stack.length) {
+      node = stack[stack.length - 1]
+      result.push(node)
+      stack.pop()
+      if (node.right) stack.push(this.#tree[node.right])
+      if (node.left) stack.push(this.#tree[node.left])
+    }
+    if (func) {
+      for (let i = 0; i < result.length; i++) {
+        const address = this.#tree.indexOf(result[i])
+        const node = this.#tree[address]
+        func(node)
+      }
+    } else {
+      for (let i = 0; i < result.length; i++) {
+        result[i] = result[i].value
+      }
+      return result
+    }
+  }
+
+  // inorder
+
+  // postorder
+
   print (address = this.#root, prefix = '', isLeft = true) {
     let node
     if (typeof address === 'object') {
@@ -224,13 +256,9 @@ class Tree {
 // code below is for testing
 // still manual, no auto test yet
 const arr = []
-for (let i = -10; i < 11; i += 2) if (!(i % 2)) arr.push(i)
+for (let i = 1; i < 20; i++) arr.push(i)
 const data = new Tree(arr)
 data.buildTree()
-// data.print()
-// for (let i = -10; i < 11; i++) if (i % 2) data.insert(i)
-// data.print()
-// for (let i = -10; i < 11; i++) if (!(i % 3)) data.delete(i)
-// data.print()
-console.log(data.levelOrder())
-data.levelOrder(console.log)
+data.print()
+console.log(data.preorder())
+data.preorder(console.log)
