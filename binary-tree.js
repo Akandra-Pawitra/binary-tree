@@ -174,6 +174,7 @@ class Tree {
     // to pass a function, don't invoke it (adding () parentheses)
     // for example, console.log
     // or better, use function expression instead declaration
+    // FIFO
     const queue = []
     const result = []
     queue.push(this.#tree[this.#root])
@@ -203,6 +204,107 @@ class Tree {
     }
   }
 
+  preorder (func = null) {
+    // LIFO
+    const stack = []
+    const result = []
+    let node = this.#tree[this.#root]
+    stack.push(node)
+    while (stack.length) {
+      node = stack[stack.length - 1]
+      result.push(node)
+      stack.pop()
+      if (node.right) stack.push(this.#tree[node.right])
+      if (node.left) stack.push(this.#tree[node.left])
+    }
+    if (func) {
+      for (let i = 0; i < result.length; i++) {
+        func(result[i])
+      }
+    } else {
+      for (let i = 0; i < result.length; i++) {
+        result[i] = result[i].value
+      }
+      return result
+    }
+  }
+
+  inorder (func = null) {
+    const stack = []
+    const result = []
+    let node = this.#tree[this.#root]
+    stack.push(node)
+    while (stack.length) {
+      node = stack[stack.length - 1]
+      const index = stack.indexOf(node)
+      // because it's not truly LIFO, set traverse flag for later iteration
+      if (node.traverse) {
+        result.push(node)
+        stack.splice(index, 1)
+        continue
+      } else {
+        node.traverse = true
+      }
+      if (node.right) stack.splice(index, 0, this.#tree[node.right])
+      if (node.left) stack.push(this.#tree[node.left])
+      if (!node.right && !node.left) {
+        result.push(node)
+        stack.splice(index, 1)
+      }
+    }
+    // remove no longer used traverse flag
+    for (let i = 0; i < result.length; i++) {
+      delete result[i].traverse
+    }
+    if (func) {
+      for (let i = 0; i < result.length; i++) {
+        func(result[i])
+      }
+    } else {
+      for (let i = 0; i < result.length; i++) {
+        result[i] = result[i].value
+      }
+      return result
+    }
+  }
+
+  postorder (func = null) {
+    const stack = []
+    const result = []
+    let node = this.#tree[this.#root]
+    stack.push(node)
+    while (stack.length) {
+      node = stack[stack.length - 1]
+      const index = stack.indexOf(node)
+      if (node.traverse) {
+        result.push(node)
+        stack.splice(index, 1)
+        continue
+      } else {
+        node.traverse = true
+      }
+      if (node.right) stack.push(this.#tree[node.right])
+      if (node.left) stack.push(this.#tree[node.left])
+      if (!node.right && !node.left) {
+        result.push(node)
+        stack.splice(index, 1)
+      }
+    }
+    for (let i = 0; i < result.length; i++) {
+      delete result[i].traverse
+    }
+    if (func) {
+      for (let i = 0; i < result.length; i++) {
+        func(result[i])
+      }
+    } else {
+      for (let i = 0; i < result.length; i++) {
+        result[i] = result[i].value
+      }
+      return result
+    }
+  }
+
   print (address = this.#root, prefix = '', isLeft = true) {
     let node
     if (typeof address === 'object') {
@@ -223,14 +325,23 @@ class Tree {
 
 // code below is for testing
 // still manual, no auto test yet
-const arr = []
-for (let i = -10; i < 11; i += 2) if (!(i % 2)) arr.push(i)
+const arr = [25]
+// for (let i = 1; i < 20; i += 2) arr.push(i)
 const data = new Tree(arr)
 data.buildTree()
-// data.print()
-// for (let i = -10; i < 11; i++) if (i % 2) data.insert(i)
-// data.print()
-// for (let i = -10; i < 11; i++) if (!(i % 3)) data.delete(i)
-// data.print()
-console.log(data.levelOrder())
-data.levelOrder(console.log)
+data.insert(15)
+data.insert(50)
+data.insert(10)
+data.insert(22)
+data.insert(35)
+data.insert(70)
+data.insert(4)
+data.insert(12)
+data.insert(18)
+data.insert(24)
+data.insert(31)
+data.insert(44)
+data.insert(66)
+data.insert(90)
+data.print()
+console.log(data.inorder(), data.preorder(), data.postorder())
