@@ -101,6 +101,18 @@ class Tree {
     }
   }
 
+  depth (node) {
+    let depth = 0
+    let root = this.#tree[this.#root]
+    while (node.value !== root.value) {
+      node.value > root.value
+        ? root = this.#tree[root.right]
+        : root = this.#tree[root.left]
+      depth++
+    }
+    return depth
+  }
+
   delete (value) {
     // I don't even know why or how this method work
     // find node and keep track the parent
@@ -325,23 +337,9 @@ class Tree {
 
 // code below is for testing
 // still manual, no auto test yet
-const arr = [25]
-// for (let i = 1; i < 20; i += 2) arr.push(i)
+const arr = []
+for (let i = 1; i < 20; i += 2) arr.push(i)
 const data = new Tree(arr)
 data.buildTree()
-data.insert(15)
-data.insert(50)
-data.insert(10)
-data.insert(22)
-data.insert(35)
-data.insert(70)
-data.insert(4)
-data.insert(12)
-data.insert(18)
-data.insert(24)
-data.insert(31)
-data.insert(44)
-data.insert(66)
-data.insert(90)
 data.print()
-console.log(data.inorder(), data.preorder(), data.postorder())
+console.log(data.depth(data.find(3)))
