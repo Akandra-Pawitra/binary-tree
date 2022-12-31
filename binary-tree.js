@@ -231,7 +231,46 @@ class Tree {
     }
   }
 
-  // inorder
+  inorder (func = null) {
+    const stack = []
+    const result = []
+    let node = this.#tree[this.#root]
+    stack.push(node)
+    while (stack.length) {
+      node = stack[stack.length - 1]
+      const index = stack.indexOf(node)
+      // because it's not truly LIFO, set traverse flag for later iteration
+      if (node.traverse) {
+        result.push(node)
+        stack.splice(index, 1)
+        continue
+      } else {
+        node.traverse = true
+      }
+      if (node.right) stack.splice(index, 0, this.#tree[node.right])
+      if (node.left) stack.push(this.#tree[node.left])
+      if (!node.right && !node.left) {
+        result.push(node)
+        stack.splice(index, 1)
+      }
+    }
+    // remove no longer used traverse flag
+    for (let i = 0; i < result.length; i++) {
+      delete result[i].traverse
+    }
+    if (func) {
+      for (let i = 0; i < result.length; i++) {
+        const address = this.#tree.indexOf(result[i])
+        const node = this.#tree[address]
+        func(node)
+      }
+    } else {
+      for (let i = 0; i < result.length; i++) {
+        result[i] = result[i].value
+      }
+      return result
+    }
+  }
 
   // postorder
 
@@ -260,5 +299,4 @@ for (let i = 1; i < 20; i++) arr.push(i)
 const data = new Tree(arr)
 data.buildTree()
 data.print()
-console.log(data.preorder())
-data.preorder(console.log)
+data.inorder(console.log)
