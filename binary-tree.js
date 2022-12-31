@@ -219,9 +219,7 @@ class Tree {
     }
     if (func) {
       for (let i = 0; i < result.length; i++) {
-        const address = this.#tree.indexOf(result[i])
-        const node = this.#tree[address]
-        func(node)
+        func(result[i])
       }
     } else {
       for (let i = 0; i < result.length; i++) {
@@ -260,9 +258,7 @@ class Tree {
     }
     if (func) {
       for (let i = 0; i < result.length; i++) {
-        const address = this.#tree.indexOf(result[i])
-        const node = this.#tree[address]
-        func(node)
+        func(result[i])
       }
     } else {
       for (let i = 0; i < result.length; i++) {
@@ -299,9 +295,7 @@ class Tree {
     }
     if (func) {
       for (let i = 0; i < result.length; i++) {
-        const address = this.#tree.indexOf(result[i])
-        const node = this.#tree[address]
-        func(node)
+        func(result[i])
       }
     } else {
       for (let i = 0; i < result.length; i++) {
