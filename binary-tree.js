@@ -47,14 +47,12 @@ class Tree {
     }
   }
 
-  buildTree () {
+  buildTree (arr = null) {
+    if (arr === null) arr = this.input
     // doesn't accept undefined value
-    let arr = []
-    for (let i = 0; i < this.input.length; i++) {
-      if (this.input[i] !== undefined) arr.push(this.input[i])
-    }
+    arr = arr.filter((e) => e !== undefined)
     // remove duplicate and sort ascending
-    arr = Array.from(new Set(this.input))
+    arr = Array.from(new Set(arr))
     arr = arr.sort((a, b) => a - b)
     this.#addNode(arr)
     return this.#tree[this.#root]
@@ -97,74 +95,6 @@ class Tree {
         }
       }
     }
-  }
-
-  height (node) {
-    // find the node position in the tree
-    let treeNode = this.#tree[this.#root]
-    while (node.value !== treeNode.value) {
-      node.value > treeNode.value
-        ? treeNode = this.#tree[treeNode.right]
-        : treeNode = this.#tree[treeNode.left]
-    }
-    // traverse the tree per level
-    let [batch, queue] = [[], []]
-    batch.push(treeNode)
-    let nodeHeight = 0
-    while (batch.length) {
-      // queue all queued node children
-      for (let i = 0; i < batch.length; i++) {
-        if (batch[i].right) queue.push(this.#tree[batch[i].right])
-        if (batch[i].left) queue.push(this.#tree[batch[i].left])
-      }
-      // dequeue old node
-      batch = queue
-      queue = []
-      nodeHeight++
-    }
-    return nodeHeight
-  }
-
-  isBalanced () {
-    let [batch, queue] = [[], []]
-    const leaf = []
-    let height = 0
-    batch.push(this.#tree[this.#root])
-    while (batch.length) {
-      for (let i = 0; i < batch.length; i++) {
-        // if node has subtree, queue the subtree
-        if (batch[i].right) queue.push(this.#tree[batch[i].right])
-        if (batch[i].left) queue.push(this.#tree[batch[i].left])
-        // if node is a leaf, push to leaf array
-        if (!batch[i].right && !batch[i].left) {
-          batch[i].height = height
-          leaf.push(batch[i])
-        }
-      }
-      batch = queue
-      queue = []
-      height++
-    }
-    // get all leaf height
-    const leafHeight = []
-    for (let i = 0; i < leaf.length; i++) {
-      leafHeight.push(leaf[i].height)
-    }
-    const min = Math.min(...leafHeight)
-    const max = Math.max(...leafHeight)
-    return (max - min < 2)
-  }
-
-  depth (node) {
-    let depth = 0
-    let treeNode = this.#tree[this.#root]
-    while (node.value !== treeNode.value) {
-      node.value > treeNode.value
-        ? treeNode = this.#tree[treeNode.right]
-        : treeNode = this.#tree[treeNode.left]
-      depth++
-    }
-    return depth
   }
 
   delete (value) {
@@ -371,6 +301,82 @@ class Tree {
     }
   }
 
+  height (node) {
+    // find the node position in the tree
+    let treeNode = this.#tree[this.#root]
+    while (node.value !== treeNode.value) {
+      node.value > treeNode.value
+        ? treeNode = this.#tree[treeNode.right]
+        : treeNode = this.#tree[treeNode.left]
+    }
+    // traverse the tree per level
+    let [batch, queue] = [[], []]
+    batch.push(treeNode)
+    let nodeHeight = 0
+    while (batch.length) {
+      // queue all queued node children
+      for (let i = 0; i < batch.length; i++) {
+        if (batch[i].right) queue.push(this.#tree[batch[i].right])
+        if (batch[i].left) queue.push(this.#tree[batch[i].left])
+      }
+      // dequeue old node
+      batch = queue
+      queue = []
+      nodeHeight++
+    }
+    return nodeHeight
+  }
+
+  depth (node) {
+    let depth = 0
+    let treeNode = this.#tree[this.#root]
+    while (node.value !== treeNode.value) {
+      node.value > treeNode.value
+        ? treeNode = this.#tree[treeNode.right]
+        : treeNode = this.#tree[treeNode.left]
+      depth++
+    }
+    return depth
+  }
+
+  isBalanced () {
+    let [batch, queue] = [[], []]
+    const leaf = []
+    let height = 0
+    batch.push(this.#tree[this.#root])
+    while (batch.length) {
+      for (let i = 0; i < batch.length; i++) {
+        // if node has subtree, queue the subtree
+        if (batch[i].right) queue.push(this.#tree[batch[i].right])
+        if (batch[i].left) queue.push(this.#tree[batch[i].left])
+        // if node is a leaf, push to leaf array
+        if (!batch[i].right && !batch[i].left) {
+          batch[i].height = height
+          leaf.push(batch[i])
+        }
+      }
+      batch = queue
+      queue = []
+      height++
+    }
+    // get all leaf height
+    const leafHeight = []
+    for (let i = 0; i < leaf.length; i++) {
+      leafHeight.push(leaf[i].height)
+    }
+    const min = Math.min(...leafHeight)
+    const max = Math.max(...leafHeight)
+    return (max - min < 2)
+  }
+
+  rebalance () {
+    if (!this.isBalanced()) {
+      // any traversal method will do the job
+      const arr = this.levelOrder()
+      this.buildTree(arr)
+    }
+  }
+
   print (address = this.#root, prefix = '', isLeft = true) {
     let node
     if (typeof address === 'object') {
@@ -391,9 +397,13 @@ class Tree {
 
 // code below is for testing
 // still manual, no auto test yet
-const arr = []
-for (let i = 1; i < 20; i += 2) arr.push(i)
-const data = new Tree(arr)
+const data = new Tree([25])
 data.buildTree()
+for (let i = 0; i < 20; i++) {
+  data.insert((Math.floor(Math.random() * 100)))
+}
+data.print()
+console.log(data.isBalanced())
+data.rebalance()
 data.print()
 console.log(data.isBalanced())
