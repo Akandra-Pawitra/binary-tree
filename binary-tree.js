@@ -8,7 +8,6 @@ class Tree {
 
   #node (value) {
     // create new Node and return the address
-    // const node = new Node(value)
     const newNode = {
       value,
       left: null,
@@ -109,21 +108,51 @@ class Tree {
         : treeNode = this.#tree[treeNode.left]
     }
     // traverse the tree per level
-    const queue = []
-    queue.push(treeNode)
+    let [batch, queue] = [[], []]
+    batch.push(treeNode)
     let nodeHeight = 0
-    while (queue.length) {
-      const lastQueue = queue.length
+    while (batch.length) {
       // queue all queued node children
-      for (let i = 0; i < queue.length; i++) {
-        if (queue[i].right) queue.push(this.#tree[queue[i].right])
-        if (queue[i].left) queue.push(this.#tree[queue[i].left])
+      for (let i = 0; i < batch.length; i++) {
+        if (batch[i].right) queue.push(this.#tree[batch[i].right])
+        if (batch[i].left) queue.push(this.#tree[batch[i].left])
       }
       // dequeue old node
-      queue.splice(0, lastQueue)
+      batch = queue
+      queue = []
       nodeHeight++
     }
     return nodeHeight
+  }
+
+  isBalanced () {
+    let [batch, queue] = [[], []]
+    const leaf = []
+    let height = 0
+    batch.push(this.#tree[this.#root])
+    while (batch.length) {
+      for (let i = 0; i < batch.length; i++) {
+        // if node has subtree, queue the subtree
+        if (batch[i].right) queue.push(this.#tree[batch[i].right])
+        if (batch[i].left) queue.push(this.#tree[batch[i].left])
+        // if node is a leaf, push to leaf array
+        if (!batch[i].right && !batch[i].left) {
+          batch[i].height = height
+          leaf.push(batch[i])
+        }
+      }
+      batch = queue
+      queue = []
+      height++
+    }
+    // get all leaf height
+    const leafHeight = []
+    for (let i = 0; i < leaf.length; i++) {
+      leafHeight.push(leaf[i].height)
+    }
+    const min = Math.min(...leafHeight)
+    const max = Math.max(...leafHeight)
+    return (max - min < 2)
   }
 
   depth (node) {
@@ -367,6 +396,4 @@ for (let i = 1; i < 20; i += 2) arr.push(i)
 const data = new Tree(arr)
 data.buildTree()
 data.print()
-const node = data.find(17)
-console.log(data.height(node))
-console.log(data.depth(node))
+console.log(data.isBalanced())
