@@ -72,7 +72,7 @@ class Tree {
     let tree = this.#tree[this.#root]
     while (true) {
       // tree doesn't accept duplicate value
-      if (value === tree.value) return console.log('Duplicate value')
+      if (value === tree.value) return
       else if (value > tree.value) {
         // if tree pointer isn't null, follow the pointer
         if (tree.right !== null) {
@@ -395,15 +395,17 @@ class Tree {
   }
 }
 
-// code below is for testing
-// still manual, no auto test yet
-const data = new Tree([25])
+// driver script
+const arr = []
+for (let i = 0; i < 10; i++) arr.push((Math.floor(Math.random() * 100)))
+
+const data = new Tree(arr)
 data.buildTree()
 for (let i = 0; i < 20; i++) {
-  data.insert((Math.floor(Math.random() * 100)))
+  data.insert((Math.floor(Math.random() * 1000)))
 }
 data.print()
-console.log(data.isBalanced())
+console.log(data.isBalanced(), data.levelOrder(), data.preorder(), data.inorder(), data.postorder())
 data.rebalance()
 data.print()
-console.log(data.isBalanced())
+console.log(data.isBalanced(), data.levelOrder(), data.preorder(), data.inorder(), data.postorder())
